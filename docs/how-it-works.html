@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How Fietao works</title>
+<style>
+:root{--bg:#121214;--card:#1c1c20;--line:#2c2c33;--ink:#f0f0f3;--mute:#9a9aa3;--accent:#7c9cff;--ok:#5cc282;--warn:#e7a050;--bad:#ef6b6b}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:500 30px/1.35 system-ui,"Segoe UI",sans-serif;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1080px;height:1080px;transform-origin:center;background:var(--bg)}
+.scene{position:absolute;inset:0;padding:90px;box-sizing:border-box;opacity:0}
+h1{font-size:96px;margin:0;letter-spacing:-2px}
+h2{font-size:56px;margin:0 0 40px;letter-spacing:-1px}
+.tag{font-size:40px;color:var(--mute);margin-top:24px}
+.kicker{font-size:26px;color:var(--accent);text-transform:uppercase;letter-spacing:3px;margin-bottom:14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:26px 30px;box-sizing:border-box}
+.steps .card{position:absolute;left:90px;width:900px;height:150px;display:flex;align-items:center;gap:30px}
+.num{flex:none;width:70px;height:70px;border-radius:50%;background:var(--accent);color:#0b0b10;font-weight:800;font-size:38px;display:grid;place-items:center}
+.steps b{font-size:36px}.steps small{display:block;color:var(--mute);font-size:26px}
+code{font-family:"Cascadia Code",Consolas,monospace;font-size:.9em;background:#26262c;border-radius:8px;padding:2px 10px;color:#cfd8ff}
+.node{position:absolute;width:290px;height:104px;margin:-52px 0 0 -145px;padding:12px 16px;display:grid;place-items:center;text-align:center;font-size:26px;line-height:1.2}
+.node.on{border-color:var(--accent);background:#232847}
+#dot{position:absolute;width:30px;height:30px;margin:-15px;border-radius:50%;background:var(--accent);box-shadow:0 0 30px var(--accent)}
+.center{position:absolute;left:390px;top:520px;text-align:center;color:var(--mute);font-size:28px;width:300px}
+.alert{position:absolute;left:90px;right:90px;bottom:50px;height:110px;display:flex;align-items:center;gap:24px;font-size:30px}
+.alert.bad{border-color:var(--bad);background:#3a1e22}.alert.good{border-color:var(--ok);background:#1d3527}
+.row{display:flex;gap:20px;align-items:center;margin:0 0 26px}
+.chip{width:150px;height:84px;display:grid;place-items:center;font-size:34px;border-radius:16px;border:2px solid var(--line);background:var(--card)}
+.chip.pass{border-color:var(--ok);color:var(--ok)}.chip.fail{border-color:var(--warn);color:var(--warn)}
+.box{width:110px;height:110px;border-radius:20px;display:grid;place-items:center;font-size:60px;background:#26262c}
+.term{font-family:"Cascadia Code",Consolas,monospace;font-size:28px;background:#0b0b0d;border:2px solid var(--line);border-radius:18px;padding:26px 30px;color:#cfd2da;white-space:pre}
+.term .p{color:var(--ok)}
+.agents{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:50px}
+.agents span{border:2px solid var(--line);border-radius:999px;padding:10px 24px;font-size:28px;color:var(--mute)}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- 1. Title -->
+  <section class="scene" id="s1" style="display:flex;flex-direction:column;justify-content:center">
+    <div class="kicker">AI study coach</div>
+    <h1>Fietao</h1>
+    <div class="tag">Tutors you without doing your homework.<br>Scores you honestly.</div>
+  </section>
+
+  <!-- 2. How to use -->
+  <section class="scene steps" id="s2">
+    <div class="kicker">How to use it</div>
+    <h2>Four steps</h2>
+    <div class="card" id="st1" style="top:300px"><div class="num">1</div><div><b>Drop your course files in</b><small><code>chem101/materials/</code>: slides, PDFs, readings</small></div></div>
+    <div class="card" id="st2" style="top:475px"><div class="num">2</div><div><b>Say "set up chem101"</b><small>The AI writes notes, word cards and a topic checklist</small></div></div>
+    <div class="card" id="st3" style="top:650px"><div class="num">3</div><div><b>Say "study chem101"</b><small>Hints, not answers. Or "flashcards", or "visualize"</small></div></div>
+    <div class="card" id="st4" style="top:825px"><div class="num">4</div><div><b>See what's weak</b><small><code>python tools/status.py</code> and the report page</small></div></div>
+  </section>
+
+  <!-- 3. The loop -->
+  <section class="scene" id="s3">
+    <div class="kicker">Behind it</div>
+    <h2>Every question runs this loop</h2>
+    <svg width="1080" height="1080" style="position:absolute;inset:0" aria-hidden="true"><circle cx="540" cy="560" r="280" fill="none" stroke="#2c2c33" stroke-width="4" stroke-dasharray="10 12"/></svg>
+    <div class="card node" id="n0">How sure? 1 · 2 · 3</div>
+    <div class="card node" id="n1">Question</div>
+    <div class="card node" id="n2">Your answer</div>
+    <div class="card node" id="n3">Graded against<br>the source</div>
+    <div class="card node" id="n4">Logged to<br><code>scores.md</code></div>
+    <div id="dot"></div>
+    <div class="center" id="loopNote">Sure but wrong?<br>That's the gap it finds.</div>
+    <div class="card alert bad" id="hookBad">🛑 <div><b>Stop hook:</b> the AI asked a question but didn't log the score. Sent back.</div></div>
+    <div class="card alert good" id="hookGood">✅ <div>Score logged. Nothing gets skipped.</div></div>
+  </section>
+
+  <!-- 4. Honest progress -->
+  <section class="scene" id="s4">
+    <div class="kicker">Honest progress</div>
+    <h2>Done means 2 passes in a row</h2>
+    <div class="row" style="margin-top:50px">
+      <div style="width:330px;font-size:34px">Meiosis · Define</div>
+      <div class="chip fail" id="c1">1/3</div>
+      <div class="chip pass" id="c2">4/5</div>
+      <div class="chip pass" id="c3">5/5</div>
+      <div class="box" id="box">🟨</div>
+    </div>
+    <div class="term" id="term" style="margin-top:60px"><span class="p">$</span> python tools/status.py chem101
+== chem101: exam in 9d · ✅ 7/12
+<span id="flag">NEVER PRACTICED: Enzymes — Apply</span></div>
+  </section>
+
+  <!-- 5. End -->
+  <section class="scene" id="s5" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+    <h1>Fietao</h1>
+    <div class="tag">github.com/fietao/Fietao-study</div>
+    <div class="agents"><span>Claude Code</span><span>Codex</span><span>Gemini CLI</span><span>Cursor</span></div>
+  </section>
+</div>
+
+<script>
+// One timeline, drawn from a time value. ?t=12.5 draws a single frame (used to render video); otherwise it plays and loops.
+var TOTAL = 26;
+var $ = function (id) { return document.getElementById(id); };
+var clamp = function (x) { return Math.max(0, Math.min(1, x)); };
+var ease = function (x) { x = clamp(x); return x * x * (3 - 2 * x); };
+var seg = function (t, a, b) { return ease((t - a) / (b - a)); };
+// visible from a to b with a fade at each end
+var win = function (t, a, b, f) { f = f || 0.5; return Math.min(seg(t, a, a + f), 1 - seg(t, b - f, b)); };
+function show(el, o, dy) { el.style.opacity = o; el.style.transform = "translateY(" + ((1 - o) * (dy || 30)) + "px)"; }
+
+var CX = 540, CY = 560, R = 280, nodes = [0, 1, 2, 3, 4].map(function (i) {
+  var a = -Math.PI / 2 + i * 2 * Math.PI / 5;
+  var el = $("n" + i); el.style.left = CX + R * Math.cos(a) + "px"; el.style.top = CY + R * Math.sin(a) + "px";
+  return { el: el, a: a };
+});
+
+function draw(t) {
+  show($("s1"), win(t, 0, 3.6));
+  show($("s2"), win(t, 3.4, 10.2), 0);
+  ["st1", "st2", "st3", "st4"].forEach(function (id, i) { show($(id), seg(t, 4.2 + i * 1.3, 4.8 + i * 1.3), 40); });
+
+  show($("s3"), win(t, 10, 19.2), 0);
+  nodes.forEach(function (n, i) { show(n.el, seg(t, 10.4 + i * 0.25, 10.9 + i * 0.25), 20); });
+  var p = clamp((t - 11.8) / 4.5);                 // one trip round the loop
+  var a = -Math.PI / 2 + p * 2 * Math.PI;
+  var dot = $("dot"); dot.style.opacity = Math.min(seg(t, 11.5, 11.8), 1 - seg(t, 16.3, 16.6));
+  dot.style.left = CX + R * Math.cos(a) + "px"; dot.style.top = CY + R * Math.sin(a) + "px";
+  var cur = p > 0 && p < 1 ? Math.floor(p * 5 + 0.5) % 5 : -1;
+  nodes.forEach(function (n, i) { n.el.classList.toggle("on", i === cur); });
+  show($("loopNote"), win(t, 12, 16.5), 10);
+  show($("hookBad"), win(t, 16.6, 18, 0.3), 20);
+  show($("hookGood"), seg(t, 18, 18.3), 20);
+
+  show($("s4"), win(t, 19, 23.2), 0);
+  show($("c1"), seg(t, 19.6, 19.9), 20); show($("c2"), seg(t, 20.3, 20.6), 20); show($("c3"), seg(t, 21, 21.3), 20);
+  $("box").textContent = t >= 21.4 ? "✅" : "🟨";
+  $("box").style.transform = "scale(" + (1 + 0.25 * win(t, 21.3, 21.9, 0.3)) + ")";
+  show($("term"), seg(t, 21.8, 22.2), 20);
+  $("flag").style.color = "var(--warn)";
+
+  show($("s5"), seg(t, 23, 23.6), 0);
+}
+
+function fit() { var s = Math.min(innerWidth, innerHeight) / 1080; $("stage").style.transform = "translate(-50%,-50%) scale(" + s + ")"; }
+addEventListener("resize", fit); fit();
+
+var q = new URLSearchParams(location.search).get("t");
+if (q !== null) { draw(+q); }
+else {
+  var start = performance.now();
+  (function loop(now) { draw(((now - start) / 1000) % TOTAL); requestAnimationFrame(loop); })(start);
+}
+</script>
+</body>
+</html>

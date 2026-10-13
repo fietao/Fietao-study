@@ -2,7 +2,7 @@
 
 An AI study coach for any AI coding agent (Claude Code, Codex, Gemini CLI, Cursor, ...) that tutors you without doing your homework, and scores you honestly.
 
-![Report for the demo class](screenshot.png)
+![How Fietao works: four steps, then the study loop behind it](docs/how-it-works.gif)
 
 ## Why I built it
 
@@ -18,6 +18,8 @@ How it fixes that:
 - **Only marks a topic done after 2 passing scores in a row.** A script checks this, so the AI can't just say "you've got it."
 
 ## How it works
+
+![Report for the demo class](screenshot.png)
 
 ```
 AGENTS.md       ← the rules every AI follows (CLAUDE.md and GEMINI.md import it)
