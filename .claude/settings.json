@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python tools/status.py:*)",
+      "Bash(python tools/report.py:*)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/stop_check.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
